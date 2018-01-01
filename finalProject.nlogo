@@ -24,6 +24,32 @@ to test-cur
   let curMax (max item 0 matrix:to-row-list a3)
   user-message word "my senses tell me this is a " position curMax item 0 matrix:to-row-list a3
 end
+;;loads neural network weights from a file
+to load-weights
+  file-close-all
+  file-open (word (word "savedWeights/" save-file-name) ".txt")
+  set theta1 (matrix:from-row-list file-read)
+  set theta2 (matrix:from-row-list file-read)
+  file-close-all
+end
+;;saves neural network weights to a file
+to save-weights
+  file-close-all
+  carefully [file-delete (word (word "savedWeights/" save-file-name) ".txt")][ ]
+  file-open (word (word "savedWeights/" save-file-name) ".txt")
+  file-write (matrix:to-row-list theta1)
+  file-write (matrix:to-row-list theta2)
+  file-close-all
+end
+to load-preset-weights
+  ;;loads preset weights from text file
+  file-close-all
+  file-open "trainedWeights.txt"
+  set theta1 (matrix:from-row-list file-read)
+  set theta2 (matrix:from-row-list file-read)
+  file-close-all
+
+end
 to train-once
   ;;make training set
   create-training-set batch-size
@@ -278,7 +304,7 @@ TEXTBOX
 18
 808
 43
-user buttons
+User buttons
 20
 0.0
 1
@@ -306,8 +332,8 @@ MONITOR
 202
 401
 % correct in last batch
-batch-correct
-2
+batch-correct * 100
+5
 1
 11
 
@@ -406,6 +432,147 @@ learning-rate
 1
 NIL
 HORIZONTAL
+
+TEXTBOX
+25
+449
+324
+524
+Known Bugs (which I can't fix)
+20
+0.0
+1
+
+TEXTBOX
+28
+487
+178
+529
+- Numbers that are too large for netlogo being created by the sigmoid function\n
+11
+0.0
+1
+
+TEXTBOX
+27
+579
+340
+629
+Known Bugs (which you can fix)
+20
+0.0
+1
+
+TEXTBOX
+32
+624
+182
+694
+- If you get something in the lines of \"file not found\", remove the project folder from the .zip file and place it in a non temporary directory. 
+11
+0.0
+1
+
+BUTTON
+654
+205
+904
+238
+Load Preset Weights ( ~95% accuracy)
+load-preset-weights\n
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+TEXTBOX
+658
+180
+808
+198
+If your computer is a potato:
+11
+0.0
+1
+
+TEXTBOX
+962
+62
+1112
+80
+Save weights:\n
+11
+0.0
+1
+
+CHOOSER
+959
+91
+1097
+136
+save-file-name
+save-file-name
+"weights1" "weights2" "weights3" "weights4" "weights5"
+4
+
+BUTTON
+1120
+96
+1183
+129
+Save
+save-weights
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+TEXTBOX
+961
+166
+1111
+184
+Load weight:
+11
+0.0
+1
+
+CHOOSER
+960
+198
+1098
+243
+load-file-name
+load-file-name
+"weights1" "weights2" "weights3" "weights4" "weights5"
+4
+
+BUTTON
+1118
+201
+1182
+234
+Load
+load-weights
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
