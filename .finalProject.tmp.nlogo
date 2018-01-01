@@ -4,14 +4,10 @@ globals [
  outputs ;;correct labels for inputs
  theta1 ;;first theta
  theta2 ;;second theta
- hidden-layer-size ;;size of the hidden layer (not counting the bias)
- batch-size ;;how many training examples we use per batch
- cur-error ;;current error on neural net
+ batch-correct ;;current error on neural net
 ]
 to setup
   reset-ticks
-  set hidden-layer-size 100
-  set batch-size 100
   set theta1 (create-theta hidden-layer-size 401)
   set theta2 (create-theta 10 (hidden-layer-size + 1))
 end
@@ -26,7 +22,7 @@ to test-cur
   let a3 (sigmoid z3)
 
   let curMax (max item 0 matrix:to-row-list a3)
-  printposition curMax item 0 matrix:to-row-list a3
+  user-message word "my senses tell me this is a " position curMax item 0 matrix:to-row-list a3
 end
 to train-once
   ;;make training set
@@ -40,7 +36,7 @@ to train-once
   let a3 (sigmoid z3)
 
   ;;update error
-  set cur-error (calculate-error a3 outputs)
+  set batch-correct (correct-in-batch a3 outputs)
 
   ;;backpropagate
   let d3 (a3 matrix:- outputs)
@@ -50,18 +46,38 @@ to train-once
   let delta1 (matrix:times-scalar ((matrix:transpose d2) matrix:* a1) (1 / batch-size))
   let delta2 (matrix:times-scalar ((matrix:transpose d3) matrix:* a2) (1 / batch-size))
 
+  set delta1 (matrix
+
   ;;apply slopes
   set theta1 (theta1 matrix:- delta1)
   set theta2 (theta2 matrix:- delta2)
 
 end
+to-report apply-learning-rate [n]
+  report n * learning-rate
+end
 ;;reports error between predicted and actual values of a neural network
-to-report calculate-error [predicted actual]
-  let diff ((matrix:copy predicted) matrix:- (matrix:copy actual))
-  set diff (matrix:times-element-wise diff diff)
-  set diff (map sum (matrix:to-row-list diff))
-  set diff ((sum diff) / (length diff))
-  report diff
+to-report correct-in-batch [predicted actual]
+  set predicted (matrix:to-row-list predicted)
+  set actual (matrix:to-row-list actual)
+
+  let numCorrect 0
+
+  let i 0
+  while [i < (length predicted)][
+   let curPredicted (item i predicted)
+   let curActual (item i actual)
+
+   set curPredicted position (max curPredicted) curPredicted
+   set curActual position 1 curActual
+
+   if(curPredicted = curActual) [
+     set numCorrect (numCorrect + 1)
+   ]
+
+   set i (i + 1)
+  ]
+  report (numCorrect / (length predicted))
 end
 ;;function used in backpropagation
 to-report delete-first-column [matrixIn]
@@ -179,9 +195,9 @@ to load-random [num]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-197
+211
 17
-605
+619
 426
 -1
 -1
@@ -206,9 +222,9 @@ ticks
 30.0
 
 BUTTON
-639
+653
 351
-851
+865
 384
 Load Random Digit From Dataset
 load-random (random 10)\n
@@ -223,9 +239,9 @@ NIL
 1
 
 BUTTON
-645
+659
 56
-740
+754
 89
 NIL
 setup-draw\n
@@ -240,9 +256,9 @@ NIL
 1
 
 BUTTON
-645
+659
 91
-708
+722
 124
 NIL
 draw
@@ -257,20 +273,20 @@ NIL
 1
 
 TEXTBOX
-647
-19
-797
-44
+658
+18
+808
+43
 user buttons
 20
 0.0
 1
 
 BUTTON
-47
-51
-110
-84
+59
+54
+122
+87
 NIL
 setup\n
 NIL
@@ -284,21 +300,21 @@ NIL
 1
 
 MONITOR
-48
-217
-189
-262
-% correct of last batch
-cur-error
+5
+356
+202
+401
+% correct in last batch
+batch-correct
 2
 1
 11
 
 BUTTON
-50
-158
-113
-191
+61
+305
+124
+338
 Train
 train-once
 T
@@ -312,10 +328,10 @@ NIL
 1
 
 BUTTON
-643
-291
-812
-324
+654
+294
+823
+327
 Classify Current Drawing
 test-cur
 NIL
@@ -327,6 +343,68 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+14
+114
+186
+147
+hidden-layer-size
+hidden-layer-size
+1
+100
+29.0
+1
+1
+NIL
+HORIZONTAL
+
+BUTTON
+49
+259
+138
+292
+Train once
+train-once
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+17
+162
+189
+195
+batch-size
+batch-size
+1
+1001
+101.0
+50
+1
+NIL
+HORIZONTAL
+
+SLIDER
+16
+216
+188
+249
+learning-rate
+learning-rate
+0
+1
+0.6
+0.01
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
