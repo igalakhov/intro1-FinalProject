@@ -6,12 +6,15 @@ globals [
  theta2 ;;second theta
  batch-correct ;;current error on neural net
 ]
+turtles-own [
+ centroidId
+]
 to setup
   reset-ticks
   set theta1 (create-theta hidden-layer-size 401)
   set theta2 (create-theta 10 (hidden-layer-size + 1))
 end
-to test-cur
+to-report test-cur
   let cur (matrix:make-constant 1 400 0)
   matrix:set-row cur 0 get-patch-colors
 
@@ -22,7 +25,39 @@ to test-cur
   let a3 (sigmoid z3)
 
   let curMax (max item 0 matrix:to-row-list a3)
-  user-message word "my senses tell me this is a " position curMax item 0 matrix:to-row-list a3
+  let prediction position curMax item 0 matrix:to-row-list a3
+  report prediction
+end
+;;attempts to use K means clustering
+to classify-two
+  let k-threshold 10
+  cro 1 [setxy 0 (-19 / 2) set centroidId 0 set color red]
+  cro 1 [setxy 19 (-19 / 2) set centroidId 1 set color blue]
+  repeat k-threshold [
+    ;;classify
+    ask patches with [pcolor != black] [
+      let which-centroid (item 0 ([centroidId] of turtles with-min [distance myself]))
+      ;;show which-centroid
+      ifelse (which-centroid = 0)[set pcolor red][set pcolor blue]
+    ]
+    ;;move turtles
+    ask turtles with [centroidId = 0][
+      set xcor mean [pxcor] of patches with [pcolor = red]
+      set ycor mean [pycor] of patches with [pcolor = red]
+    ]
+    ask turtles with [centroidId = 1][
+      set xcor mean [pxcor] of patches with [pcolor = blue]
+      set ycor mean [pycor] of patches with [pcolor = blue]
+    ]
+    ;reset
+    ask patches with [pcolor = blue or pcolor = red] [set pcolor white]
+  ]
+      ask patches with [pcolor != black] [
+      let which-centroid (item 0 ([centroidId] of turtles with-min [distance myself]))
+      ;;show which-centroid
+      ifelse (which-centroid = 0)[set pcolor red][set pcolor blue]
+    ]
+  ask turtles [die]
 end
 ;;loads neural network weights from a file
 to load-weights
@@ -203,7 +238,8 @@ to draw
      set pcolor white
      ask neighbors4 [
        if (pcolor != white) [
-          set pcolor random 10
+          set pcolor white
+          ;;set pcolor random 10
         ]
       ]
     ]
@@ -222,10 +258,10 @@ to load-random [num]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-211
-17
-619
-426
+225
+37
+633
+446
 -1
 -1
 20.0
@@ -235,8 +271,8 @@ GRAPHICS-WINDOW
 1
 1
 0
-1
-1
+0
+0
 1
 0
 19
@@ -249,10 +285,10 @@ ticks
 30.0
 
 BUTTON
-653
-351
-865
-384
+660
+394
+872
+427
 Load Random Digit From Dataset
 load-random (random 10)\n
 NIL
@@ -355,12 +391,12 @@ NIL
 1
 
 BUTTON
-654
-294
-823
-327
-Classify Current Drawing
-test-cur
+658
+353
+873
+386
+Classify Current Drawing (1 digit)
+user-message test-cur
 NIL
 1
 T
@@ -412,7 +448,7 @@ batch-size
 batch-size
 1
 1001
-1001.0
+101.0
 50
 1
 NIL
