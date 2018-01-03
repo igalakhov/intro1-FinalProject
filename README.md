@@ -20,3 +20,7 @@ There are three parameters that you can control in when training the neural netw
 4. Notice that the number shown on the "% correct in last batch" goes up
 5. Once the network finishes training, use the setup-draw and draw buttons to load your own examples into the network
 
+### How to download
+1. Download from [dropbox](https://www.dropbox.com/s/td7uhfiye4fr3ig/intro1-FinalProject-master.zip?dl=0)
+2. Download from this repo directly (click the green "clone or download" button at the top, and download as zip)
+
