@@ -9,6 +9,11 @@ globals [
 turtles-own [
  centroidId
 ]
+patches-own [
+ which-centroid
+ org-color
+ next
+]
 to setup
   reset-ticks
   set theta1 (create-theta hidden-layer-size 401)
@@ -30,33 +35,54 @@ to-report test-cur
 end
 ;;attempts to use K means clustering
 to classify-two
+
   let k-threshold 10
   cro 1 [setxy 0 (-19 / 2) set centroidId 0 set color red]
   cro 1 [setxy 19 (-19 / 2) set centroidId 1 set color blue]
+  ask patches [set which-centroid -1 set org-color pcolor]
   repeat k-threshold [
     ;;classify
     ask patches with [pcolor != black] [
-      let which-centroid (item 0 ([centroidId] of turtles with-min [distance myself]))
+      set which-centroid (item 0 ([centroidId] of turtles with-min [distance myself]))
       ;;show which-centroid
       ifelse (which-centroid = 0)[set pcolor red][set pcolor blue]
     ]
     ;;move turtles
     ask turtles with [centroidId = 0][
+      carefully [
       set xcor mean [pxcor] of patches with [pcolor = red]
       set ycor mean [pycor] of patches with [pcolor = red]
+      ][]
     ]
     ask turtles with [centroidId = 1][
+      carefully [
       set xcor mean [pxcor] of patches with [pcolor = blue]
       set ycor mean [pycor] of patches with [pcolor = blue]
+      ][]
     ]
     ;reset
     ask patches with [pcolor = blue or pcolor = red] [set pcolor white]
   ]
-      ask patches with [pcolor != black] [
-      let which-centroid (item 0 ([centroidId] of turtles with-min [distance myself]))
-      ;;show which-centroid
-      ifelse (which-centroid = 0)[set pcolor red][set pcolor blue]
-    ]
+  ask patches [if which-centroid = 0 [set pcolor blue] if which-centroid = 1 [set pcolor red]]
+
+  ;;isolate the digits and classify them separately
+  let avgX0 0
+  let avgY0 0
+  ;;carefully [
+  set avgX0 round (19 / 2) - round mean [pxcor] of patches with [which-centroid = 0]
+  set avgY0 -10 ;;round (-19 / 2) - round mean [pycor] of patches with [which-centroid = 0]
+  ;;][]
+  show avgX0
+  show avgY0
+  ask patch avgX0 avgY0 [set pcolor green]
+  ask patches with [which-centroid = 0] [
+    show patch-at (-1 * avgX0) (-1 * avgY0)
+    ;;ask patch-at avgX0 avgY0 [set next white]
+  ]
+  ;;ask patches [set pcolor next]
+
+
+
   ask turtles [die]
 end
 ;;loads neural network weights from a file
@@ -258,10 +284,10 @@ to load-random [num]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-225
-37
-633
-446
+227
+20
+635
+429
 -1
 -1
 20.0
