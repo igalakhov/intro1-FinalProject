@@ -12,7 +12,8 @@ turtles-own [
 patches-own [
  which-centroid
  org-color
- next
+ c0-col
+ c1-col
 ]
 to setup
   reset-ticks
@@ -33,9 +34,16 @@ to-report test-cur
   let prediction position curMax item 0 matrix:to-row-list a3
   report prediction
 end
+to setup-two
+  cp
+  resize-world 0 25 -19 0
+end
+to setup-one
+  cp
+  resize-world 0 19 -19 0
+end
 ;;attempts to use K means clustering
-to classify-two
-
+to-report classify-two
   let k-threshold 10
   cro 1 [setxy 0 (-19 / 2) set centroidId 0 set color red]
   cro 1 [setxy 19 (-19 / 2) set centroidId 1 set color blue]
@@ -63,27 +71,34 @@ to classify-two
     ;reset
     ask patches with [pcolor = blue or pcolor = red] [set pcolor white]
   ]
+  ask turtles [die]
   ask patches [if which-centroid = 0 [set pcolor blue] if which-centroid = 1 [set pcolor red]]
-
   ;;isolate the digits and classify them separately
   let avgX0 0
   let avgY0 0
-  ;;carefully [
-  set avgX0 round (19 / 2) - round mean [pxcor] of patches with [which-centroid = 0]
-  set avgY0 -10 ;;round (-19 / 2) - round mean [pycor] of patches with [which-centroid = 0]
-  ;;][]
-  show avgX0
-  show avgY0
-  ask patch avgX0 avgY0 [set pcolor green]
+  let avgX1 0
+  let avgY1 0
+  carefully [
+  set avgX0 (19 / 2) - ((min [pxcor] of patches with [which-centroid = 0]) + (max [pxcor] of patches with [which-centroid = 0])) / 2
+  set avgY0 (-19 / 2) - ((min [pycor] of patches with [which-centroid = 0]) + (max [pycor] of patches with [which-centroid = 0])) / 2
+  set avgX1 (19 / 2) - ((min [pxcor] of patches with [which-centroid = 1]) + (max [pxcor] of patches with [which-centroid = 1])) / 2
+  set avgY1 (-19 / 2) - ((min [pycor] of patches with [which-centroid = 1]) + (max [pycor] of patches with [which-centroid = 1])) / 2
+  ][]
   ask patches with [which-centroid = 0] [
-    show patch-at (-1 * avgX0) (-1 * avgY0)
-    ;;ask patch-at avgX0 avgY0 [set next white]
+    ask patch-at avgX0 avgY0 [set c0-col white]
   ]
-  ;;ask patches [set pcolor next]
-
-
-
-  ask turtles [die]
+  ask patches with [which-centroid = 1] [
+    ask patch-at avgX1 avgY1 [set c1-col white]
+  ]
+  ask patches [set pcolor c0-col]
+  wait 1
+  let tensPlace test-cur
+  ask patches [set pcolor c1-col]
+  wait 1
+  let onesPlace test-cur
+  ask patches [set pcolor org-color]
+  wait 1
+  report (10 * tensPlace) + onesPlace
 end
 ;;loads neural network weights from a file
 to load-weights
@@ -264,7 +279,7 @@ to draw
      set pcolor white
      ask neighbors4 [
        if (pcolor != white) [
-          set pcolor white
+          ;;set pcolor white
           ;;set pcolor random 10
         ]
       ]
@@ -285,12 +300,12 @@ end
 @#$#@#$#@
 GRAPHICS-WINDOW
 227
-20
-635
-429
+14
+768
+433
 -1
 -1
-20.0
+20.55
 1
 10
 1
@@ -301,7 +316,7 @@ GRAPHICS-WINDOW
 0
 1
 0
-19
+25
 -19
 0
 0
@@ -311,10 +326,10 @@ ticks
 30.0
 
 BUTTON
-660
-394
-872
-427
+782
+462
+994
+495
 Load Random Digit From Dataset
 load-random (random 10)\n
 NIL
@@ -328,10 +343,10 @@ NIL
 1
 
 BUTTON
-659
-56
-754
-89
+784
+62
+879
+95
 NIL
 setup-draw\n
 NIL
@@ -345,10 +360,10 @@ NIL
 1
 
 BUTTON
-659
-91
-722
-124
+784
+97
+847
+130
 NIL
 draw
 T
@@ -362,9 +377,9 @@ NIL
 1
 
 TEXTBOX
-658
+783
 18
-808
+933
 43
 User buttons
 20
@@ -417,10 +432,10 @@ NIL
 1
 
 BUTTON
-658
-353
-873
-386
+782
+421
+997
+454
 Classify Current Drawing (1 digit)
 user-message test-cur
 NIL
@@ -442,7 +457,7 @@ hidden-layer-size
 hidden-layer-size
 1
 100
-100.0
+25.0
 1
 1
 NIL
@@ -489,7 +504,7 @@ learning-rate
 learning-rate
 0
 1
-1.0
+0.11
 0.01
 1
 NIL
@@ -536,10 +551,10 @@ TEXTBOX
 1
 
 BUTTON
-654
-205
-904
-238
+779
+211
+1029
+244
 Load Preset Weights ( ~95% accuracy)
 load-preset-weights\n
 NIL
@@ -553,40 +568,40 @@ NIL
 1
 
 TEXTBOX
-658
-180
-808
-198
+783
+186
+933
+204
 If your computer is a potato:
 11
 0.0
 1
 
 TEXTBOX
-962
-62
-1112
-80
+1068
+69
+1218
+87
 Save weights:\n
 11
 0.0
 1
 
 CHOOSER
-959
-91
-1097
-136
+1065
+98
+1203
+143
 save-file-name
 save-file-name
 "weights1" "weights2" "weights3" "weights4" "weights5"
 4
 
 BUTTON
-1120
-96
-1183
-129
+1226
+103
+1289
+136
 Save
 save-weights
 NIL
@@ -600,32 +615,83 @@ NIL
 1
 
 TEXTBOX
-961
-166
-1111
-184
+1067
+173
+1217
+191
 Load weight:
 11
 0.0
 1
 
 CHOOSER
-960
-198
-1098
-243
+1066
+205
+1204
+250
 load-file-name
 load-file-name
 "weights1" "weights2" "weights3" "weights4" "weights5"
 4
 
 BUTTON
-1118
-201
-1182
-234
+1224
+208
+1288
+241
 Load
 load-weights
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+782
+289
+969
+322
+Setup two digit classification
+setup-two
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+783
+332
+1002
+365
+Classiffy Current Drawing (2 digit)
+user-message classify-two\n
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+782
+377
+969
+410
+Setup one digit classification
+setup-one
 NIL
 1
 T
