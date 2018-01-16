@@ -370,12 +370,12 @@ User buttons
 1
 
 BUTTON
-59
-54
-122
-87
-NIL
-setup\n
+73
+57
+137
+90
+Setup
+ca\nsetup
 NIL
 1
 T
@@ -386,22 +386,11 @@ NIL
 NIL
 1
 
-MONITOR
-5
-356
-202
-401
-% correct in last batch
-batch-correct * 100
-5
-1
-11
-
 BUTTON
-61
-305
-124
-338
+75
+308
+138
+341
 Train
 train-once
 T
@@ -432,25 +421,25 @@ NIL
 1
 
 SLIDER
-14
-114
-186
-147
+28
+117
+200
+150
 hidden-layer-size
 hidden-layer-size
 1
 100
-25.0
+100.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-49
-259
-138
-292
+63
+262
+152
+295
 Train once
 train-once
 NIL
@@ -464,30 +453,30 @@ NIL
 1
 
 SLIDER
-17
-162
-189
-195
+31
+165
+203
+198
 batch-size
 batch-size
 1
-1001
-101.0
+10000
+51.0
 50
 1
 NIL
 HORIZONTAL
 
 SLIDER
-16
-216
-188
-249
+30
+219
+202
+252
 learning-rate
 learning-rate
 0
 1
-0.11
+1.0
 0.01
 1
 NIL
@@ -560,6 +549,24 @@ NIL
 NIL
 NIL
 1
+
+PLOT
+13
+364
+213
+611
+% correct in last batch
+Time
+% correct in last batch
+0.0
+10.0
+0.0
+100.0
+true
+false
+"" ""
+PENS
+"" 1.0 0 -16777216 true "" "plot batch-correct * 100"
 
 @#$#@#$#@
 ## WHAT IS IT?
