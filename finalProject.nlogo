@@ -262,8 +262,8 @@ to draw
      set pcolor white
      ask neighbors4 [
        if (pcolor != white) [
-          ;;set pcolor white
-          ;;set pcolor random 10
+          set pcolor white
+          set pcolor random 10
         ]
       ]
     ]
@@ -284,8 +284,8 @@ end
 GRAPHICS-WINDOW
 227
 14
-645
-433
+646
+434
 -1
 -1
 20.55

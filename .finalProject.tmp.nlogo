@@ -262,7 +262,7 @@ to draw
      set pcolor white
      ask neighbors4 [
        if (pcolor != white) [
-          ;;set pcolor white
+          ;set pcolor white
           ;;set pcolor random 10
         ]
       ]
@@ -284,8 +284,8 @@ end
 GRAPHICS-WINDOW
 227
 14
-645
-433
+646
+434
 -1
 -1
 20.55
@@ -635,9 +635,9 @@ This network allows you to classify either 2 or 1 digit numbers.
 ##### Code credits:
 Ivan Galakhov - python (June 2017)
 ##### Github link:
-
-##### MNIST dataset:
 https://github.com/igalakhov/intro1-FinalProject
+##### MNIST dataset:
+http://yann.lecun.com/exdb/mnist/
 ##### Image credits:
 http://neuralnetworksanddeeplearning.com/chap1.html
 @#$#@#$#@
