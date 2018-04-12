@@ -1,6 +1,6 @@
 # Explanation of my code
 
-As requested a couple of weeks ago...
+As requested around a month ago
 
 ## Backstory
 
